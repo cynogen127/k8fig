@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-s-app
+  namespace: nodejs
+  labels:
+    app: node-s-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-s-app
+  template:
+    metadata:
+      labels:
+        app: node-s-app
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: node-s-app
+          image: judi2021/mynode-app
+          ports:
+            - name: http
+              containerPort: 3000
