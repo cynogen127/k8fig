@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: node-s-app
-  namespace: nodejs
+  namespace: bjex
   labels:
     app: node-s-app
 spec:
