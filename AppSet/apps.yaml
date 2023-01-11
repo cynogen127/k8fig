@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha2
+kind: Application
+metadata:
+  name: mynode-app
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/cynogen127/serious.git
+    path: .
+  destination:
+    namespace: nodejs
+  syncPolicy:
+    automated:
+      prune: true
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+    - group: "argocd"
+      kind: Service
+  healthChecks:
+    - readinessProbe:
+        httpGet:
+          path: /
+          port: 3000
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 3000
+  deployment:
+    manifests:
+    - apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+      
+        name: mynode-app
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: mynode-app
+        template:
+          metadata:
+            labels:
+              app: mynode-app
+          spec:
+            containers:
+            - name: mynode-app
+              image: node:16-alpine
+              ports:
+              - containerPort: 3000
+              command: ["node", "index.js"]
+              volumeMounts:
+              - name: npm-cache
+                mountPath: /root/.npm
+
+      volumes:
+      - name: npm-cache
+        emptyDir: {}
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        name: mynode-app-serious-k8
+      spec:
+        type: ClusterIP
+        selector:
+          app: mynode-app
+        ports:
+        - protocol: TCP
+          port: 3000
+          targetPort: 3000
+
